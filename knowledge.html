@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dental Knowledge Hub | Murugan Impex — Free & Premium Clinical Guides</title>
+  <meta name="description" content="Expert dental clinical guides, implantology tutorials, bone graft protocols, and CAD/CAM education. Free articles + premium exclusive content for dental professionals across India.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="knowledge.css">
+</head>
+<body>
+
+  <!-- SCROLL PROGRESS -->
+  <div id="scrollProgressBar"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION BAR — changes for logged-in vs guest users
+  ═══════════════════════════════════════════════════════════ -->
+  <nav class="kh-nav" id="khNav">
+    <div class="kh-nav-inner">
+      <!-- Brand -->
+      <a href="index.html" class="kh-brand">
+        <div class="kh-brand-logo">
+          <svg viewBox="0 0 44 44" fill="none" width="36" height="36">
+            <rect width="44" height="44" rx="11" fill="url(#khGrad)"/>
+            <path d="M10 32V14L17 25L22 17L27 25L34 14V32" stroke="#FFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="22" cy="11" r="2.5" fill="#F4A261"/>
+            <defs>
+              <linearGradient id="khGrad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0F2B48"/>
+                <stop offset="0.55" stop-color="#028090"/>
+                <stop offset="1" stop-color="#00A896"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <span class="kh-brand-name">Murugan <span class="accent">Impex</span></span>
+          <span class="kh-brand-sub">Knowledge Hub</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="kh-nav-links" id="navLinks">
+        <li><a href="knowledge.html" class="active">Home</a></li>
+        <li><a href="knowledge.html#free-content">Free Content</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="knowledge.html#resources">Resources</a></li>
+        <!-- Guest only -->
+        <li class="nav-guest-only"><a href="login.html" class="kh-btn kh-btn-outline">Login</a></li>
+        <li class="nav-guest-only"><a href="pricing.html" class="kh-btn kh-btn-primary">Unlock Premium</a></li>
+        <!-- Member only -->
+        <li class="nav-member-only" style="display:none"><a href="dashboard.html">Dashboard</a></li>
+        <li class="nav-member-only" style="display:none"><a href="premium-content.html">Premium</a></li>
+        <li class="nav-member-only nav-account" style="display:none">
+          <button class="kh-avatar-btn" id="avatarBtn">
+            <span class="avatar-ring" id="avatarRing">D</span>
+            <span id="avatarName">Dr.</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-dropdown" id="navDropdown">
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="account.html">Account Settings</a>
+            <a href="premium-content.html">Premium Content</a>
+            <hr>
+            <button id="navLogoutBtn" class="dropdown-logout">Logout</button>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Mobile Hamburger -->
+      <button class="kh-hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="kh-mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-inner">
+      <a href="knowledge.html">Home</a>
+      <a href="knowledge.html#free-content">Free Content</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="knowledge.html#resources">Resources</a>
+      <div class="mobile-nav-guest">
+        <a href="login.html" class="kh-btn kh-btn-outline w-full">Login</a>
+        <a href="pricing.html" class="kh-btn kh-btn-primary w-full">Unlock Premium</a>
+      </div>
+      <div class="mobile-nav-member" style="display:none">
+        <a href="dashboard.html" class="kh-btn kh-btn-primary w-full">My Dashboard</a>
+        <a href="premium-content.html" class="kh-btn kh-btn-outline w-full">Premium Content</a>
+        <button id="mobileLogoutBtn" class="kh-btn kh-btn-ghost w-full">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO SECTION
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="kh-hero">
+    <div class="kh-hero-bg">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+    </div>
+    <div class="kh-container kh-hero-inner">
+      <div class="kh-hero-content">
+        <div class="hero-pills-row">
+          <span class="hero-pill">🎓 CE Credit Eligible</span>
+          <span class="hero-pill premium-pill">✨ NEW: Implantology Masterclass 2026</span>
+        </div>
+        <h1 class="kh-hero-title">
+          The Definitive Dental<br>
+          <span class="gradient-text">Clinical Knowledge Hub</span>
+        </h1>
+        <p class="kh-hero-desc">
+          Expert-authored clinical guides for practicing dentists across India. From bone graft protocols to CAD/CAM workflows — free starter content and an exclusive premium library for serious practitioners.
+        </p>
+        <div class="kh-hero-stats">
+          <div class="hero-stat"><span class="stat-n">120+</span><span class="stat-l">Clinical Articles</span></div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat"><span class="stat-n">14</span><span class="stat-l">Expert Authors</span></div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat"><span class="stat-n">8,400+</span><span class="stat-l">Members Enrolled</span></div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat"><span class="stat-n">CE</span><span class="stat-l">Certified Content</span></div>
+        </div>
+        <div class="kh-hero-actions">
+          <a href="#free-content" class="kh-btn kh-btn-outline kh-btn-lg">
+            📖 Explore Free Content
+          </a>
+          <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-lg">
+            ✨ Unlock Premium — ₹1,499/mo
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Featured Preview Card -->
+      <div class="kh-hero-card">
+        <div class="hero-card-badge">PREMIUM PREVIEW</div>
+        <div class="hero-card-img">
+          <img src="assets/images/german-titanium-implants.jpg" alt="Implant Protocol Guide" loading="lazy">
+          <div class="hero-card-lock">🔐</div>
+        </div>
+        <div class="hero-card-body">
+          <span class="content-type-badge">📋 Clinical Protocol</span>
+          <h3>Complete Implant Surgery Protocol: From Site Preparation to Final Crown</h3>
+          <p>Step-by-step surgical guide using Grade-V titanium implants with SLA surface. Covers bone density classification, torque values, and prosthetic workflow.</p>
+          <div class="hero-card-meta">
+            <span>⏱ 45 min read</span>
+            <span>⭐ 4.9 (248 reviews)</span>
+          </div>
+          <a href="pricing.html" class="kh-btn kh-btn-primary w-full">
+            🔓 Unlock with Premium
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TRUST BAR
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="trust-bar">
+    <div class="kh-container trust-bar-inner">
+      <span>✅ Written by IDA-certified dentists</span>
+      <span class="tb-sep">|</span>
+      <span>🏥 Trusted by 8,400+ dentists</span>
+      <span class="tb-sep">|</span>
+      <span>📜 CE Credit eligible</span>
+      <span class="tb-sep">|</span>
+      <span>🔒 Secure payments via Stripe</span>
+      <span class="tb-sep">|</span>
+      <span>💳 Cancel anytime</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FREE CONTENT SECTION
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="kh-section" id="free-content">
+    <div class="kh-container">
+      <div class="section-header">
+        <span class="section-badge">📖 FREE ACCESS</span>
+        <h2 class="section-title">Start Learning — No Account Required</h2>
+        <p class="section-desc">Curated clinical guides available to every dental professional. No signup needed for free articles.</p>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="content-filters">
+        <button class="filter-chip active" data-filter="all">All Topics</button>
+        <button class="filter-chip" data-filter="implants">Implants</button>
+        <button class="filter-chip" data-filter="biomaterials">Biomaterials</button>
+        <button class="filter-chip" data-filter="cadcam">CAD/CAM</button>
+        <button class="filter-chip" data-filter="endodontics">Endodontics</button>
+        <button class="filter-chip" data-filter="orthodontics">Orthodontics</button>
+        <button class="filter-chip" data-filter="restorative">Restorative</button>
+      </div>
+
+      <!-- Free Content Cards Grid -->
+      <div class="content-grid" id="freeContentGrid">
+        <!-- Static free articles (shown without Firebase) -->
+
+        <article class="content-card" data-cat="implants">
+          <div class="card-img-wrap">
+            <img src="assets/images/german-titanium-implants.jpg" alt="Titanium Implant Guide" loading="lazy">
+            <span class="card-tier free-tier">FREE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🔩 Implantology</span>
+            <h3 class="card-title">Understanding SLA Surface Titanium Implants: Osseointegration Mechanisms</h3>
+            <p class="card-excerpt">Explore the science behind Sand-blasted, Large-grit, Acid-etched (SLA) surfaces and how micro-roughness promotes bone-to-implant contact in Indian clinical practice.</p>
+            <div class="card-meta">
+              <span>⏱ 12 min</span>
+              <span>📖 Article</span>
+              <span>⭐ 4.8</span>
+            </div>
+            <a href="article.html?id=sla-implant-guide&tier=free" class="kh-btn kh-btn-outline card-btn">Read Article →</a>
+          </div>
+        </article>
+
+        <article class="content-card" data-cat="biomaterials">
+          <div class="card-img-wrap">
+            <img src="assets/images/swiss-bone-graft.jpg" alt="Bone Graft Guide" loading="lazy">
+            <span class="card-tier free-tier">FREE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🦴 Biomaterials</span>
+            <h3 class="card-title">Introduction to β-TCP Bone Graft Granules: Indications & Case Selection</h3>
+            <p class="card-excerpt">A beginner's guide to synthetic bioceramic bone substitutes. Learn when to use β-TCP vs hydroxyapatite, and how to select appropriate granule sizes for socket preservation.</p>
+            <div class="card-meta">
+              <span>⏱ 15 min</span>
+              <span>📖 Article</span>
+              <span>⭐ 4.9</span>
+            </div>
+            <a href="article.html?id=btcp-intro&tier=free" class="kh-btn kh-btn-outline card-btn">Read Article →</a>
+          </div>
+        </article>
+
+        <article class="content-card" data-cat="cadcam">
+          <div class="card-img-wrap">
+            <img src="assets/images/kyoto-zirconia-discs.jpg" alt="CAD/CAM Guide" loading="lazy">
+            <span class="card-tier free-tier">FREE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-category">💿 CAD/CAM</span>
+            <h3 class="card-title">Zirconia Milling Basics: Shade Selection & Pre-Sintering Workflow</h3>
+            <p class="card-excerpt">Understand multi-layer zirconia disc anatomy, shade mapping, and milling parameters for achieving natural translucency in full-arch restorations using Japanese CAD/CAM systems.</p>
+            <div class="card-meta">
+              <span>⏱ 18 min</span>
+              <span>📖 Article</span>
+              <span>⭐ 4.7</span>
+            </div>
+            <a href="article.html?id=zirconia-basics&tier=free" class="kh-btn kh-btn-outline card-btn">Read Article →</a>
+          </div>
+        </article>
+
+        <article class="content-card" data-cat="endodontics">
+          <div class="card-img-wrap">
+            <img src="assets/images/swiss-rotary-files.jpg" alt="Endodontic Guide" loading="lazy">
+            <span class="card-tier free-tier">FREE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🎯 Endodontics</span>
+            <h3 class="card-title">NiTi Rotary Files: Gold-Treatment Heat Processing & Cyclic Fatigue</h3>
+            <p class="card-excerpt">Why gold-colored heat-treated NiTi files outperform conventional stainless steel instruments. File sequencing, torque settings, and safe reuse protocols explained simply.</p>
+            <div class="card-meta">
+              <span>⏱ 10 min</span>
+              <span>📖 Article</span>
+              <span>⭐ 4.9</span>
+            </div>
+            <a href="article.html?id=niti-rotary-guide&tier=free" class="kh-btn kh-btn-outline card-btn">Read Article →</a>
+          </div>
+        </article>
+
+        <article class="content-card" data-cat="restorative">
+          <div class="card-img-wrap">
+            <img src="assets/images/biofill-composite-resin.jpg" alt="Composite Guide" loading="lazy">
+            <span class="card-tier free-tier">FREE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🧪 Restorative</span>
+            <h3 class="card-title">Nanohybrid Composite Resins: Material Science & Polishing Technique</h3>
+            <p class="card-excerpt">Deep dive into nanoparticle filler technology, MDP adhesive chemistry, and the latest wet-bonding vs dry-bonding protocols for long-lasting Class II restorations.</p>
+            <div class="card-meta">
+              <span>⏱ 14 min</span>
+              <span>📖 Article</span>
+              <span>⭐ 4.6</span>
+            </div>
+            <a href="article.html?id=composite-science&tier=free" class="kh-btn kh-btn-outline card-btn">Read Article →</a>
+          </div>
+        </article>
+
+        <article class="content-card" data-cat="orthodontics">
+          <div class="card-img-wrap">
+            <img src="assets/images/ortho-brackets-kit.jpg" alt="Orthodontics Guide" loading="lazy">
+            <span class="card-tier free-tier">FREE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🦷 Orthodontics</span>
+            <h3 class="card-title">Self-Ligating Ceramic Brackets: Friction Reduction & Clinical Advantages</h3>
+            <p class="card-excerpt">How passive self-ligating brackets reduce friction and treatment time. Comparison with conventional brackets, wire sequencing protocols, and common clinical pitfalls to avoid.</p>
+            <div class="card-meta">
+              <span>⏱ 11 min</span>
+              <span>📖 Article</span>
+              <span>⭐ 4.8</span>
+            </div>
+            <a href="article.html?id=self-ligating-guide&tier=free" class="kh-btn kh-btn-outline card-btn">Read Article →</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="section-cta-row">
+        <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-lg">View All 120+ Articles with Premium →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PREMIUM PREVIEW SECTION
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="kh-section kh-section-dark" id="premium-preview">
+    <div class="kh-container">
+      <div class="section-header light">
+        <span class="section-badge premium-badge">✨ PREMIUM MEMBERS ONLY</span>
+        <h2 class="section-title">Unlock Exclusive Clinical Content</h2>
+        <p class="section-desc" style="color: rgba(255,255,255,0.7)">Advanced protocols, masterclasses, downloadable PDFs, and members-only updates curated for serious practitioners.</p>
+      </div>
+
+      <!-- Premium Cards (locked for non-members) -->
+      <div class="content-grid premium-preview-grid">
+
+        <article class="content-card premium-card">
+          <div class="card-img-wrap">
+            <img src="assets/images/swiss-bone-graft.jpg" alt="Sinus Lift Masterclass" loading="lazy">
+            <span class="card-tier premium-tier">PREMIUM</span>
+            <div class="premium-lock-overlay">
+              <div class="lock-icon">🔐</div>
+              <p>Premium Members Only</p>
+              <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-sm">Unlock Access</a>
+            </div>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🦴 Advanced Biomaterials</span>
+            <h3 class="card-title">Lateral & Transcrestal Sinus Lift: Complete Surgical Protocol with Case Library</h3>
+            <p class="card-excerpt">20+ documented clinical cases with intraoperative photos. Covers Schneiderian membrane management, simultaneous vs staged implant placement, and complication management.</p>
+            <div class="card-meta">
+              <span>⏱ 90 min</span>
+              <span>🎬 Masterclass</span>
+              <span>⭐ 5.0</span>
+              <span class="download-badge">📥 PDF Included</span>
+            </div>
+            <a href="pricing.html" class="kh-btn kh-btn-premium w-full">🔓 Unlock with Premium</a>
+          </div>
+        </article>
+
+        <article class="content-card premium-card">
+          <div class="card-img-wrap">
+            <img src="assets/images/german-titanium-implants.jpg" alt="Immediate Loading Protocol" loading="lazy">
+            <span class="card-tier premium-tier">PREMIUM</span>
+            <div class="premium-lock-overlay">
+              <div class="lock-icon">🔐</div>
+              <p>Premium Members Only</p>
+              <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-sm">Unlock Access</a>
+            </div>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🔩 Advanced Implantology</span>
+            <h3 class="card-title">Immediate Loading Protocol for Full-Arch Implants: All-on-4 & All-on-6 Guide</h3>
+            <p class="card-excerpt">Patient selection criteria, bone density mapping with CBCT, implant angulation strategy, and provisionalization technique for same-day loading with titanium-zirconia hybrids.</p>
+            <div class="card-meta">
+              <span>⏱ 75 min</span>
+              <span>🎬 Video Guide</span>
+              <span>⭐ 4.9</span>
+              <span class="download-badge">📥 Protocol PDF</span>
+            </div>
+            <a href="pricing.html" class="kh-btn kh-btn-premium w-full">🔓 Unlock with Premium</a>
+          </div>
+        </article>
+
+        <article class="content-card premium-card">
+          <div class="card-img-wrap">
+            <img src="assets/images/kyoto-zirconia-discs.jpg" alt="Full-Arch Zirconia" loading="lazy">
+            <span class="card-tier premium-tier">PREMIUM</span>
+            <div class="premium-lock-overlay">
+              <div class="lock-icon">🔐</div>
+              <p>Premium Members Only</p>
+              <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-sm">Unlock Access</a>
+            </div>
+          </div>
+          <div class="card-body">
+            <span class="card-category">💿 Advanced CAD/CAM</span>
+            <h3 class="card-title">Full-Arch Zirconia Prosthetics: Digital Workflow from Scan to Final Delivery</h3>
+            <p class="card-excerpt">End-to-end digital protocol using IOS scanners, exocad/3Shape design software, and 5-axis milling. Fit assessment techniques and chairside adjustment protocols for implant-supported full arches.</p>
+            <div class="card-meta">
+              <span>⏱ 60 min</span>
+              <span>📋 Protocol</span>
+              <span>⭐ 4.8</span>
+              <span class="download-badge">📥 Checklist PDF</span>
+            </div>
+            <a href="pricing.html" class="kh-btn kh-btn-premium w-full">🔓 Unlock with Premium</a>
+          </div>
+        </article>
+
+        <article class="content-card premium-card">
+          <div class="card-img-wrap">
+            <img src="assets/images/swiss-rotary-files.jpg" alt="Endo Masterclass" loading="lazy">
+            <span class="card-tier premium-tier">PREMIUM</span>
+            <div class="premium-lock-overlay">
+              <div class="lock-icon">🔐</div>
+              <p>Premium Members Only</p>
+              <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-sm">Unlock Access</a>
+            </div>
+          </div>
+          <div class="card-body">
+            <span class="card-category">🎯 Advanced Endodontics</span>
+            <h3 class="card-title">Calcified Canal Management: CBCT-Guided Trephination & Ultrasonic Retreat</h3>
+            <p class="card-excerpt">Tackling the most challenging endo cases. Negotiating calcified canals using pre-curved hand files, ultrasonic tips, and CBCT image overlay techniques for impossible retreatments.</p>
+            <div class="card-meta">
+              <span>⏱ 55 min</span>
+              <span>🎬 Masterclass</span>
+              <span>⭐ 4.9</span>
+              <span class="download-badge">📥 Case Library</span>
+            </div>
+            <a href="pricing.html" class="kh-btn kh-btn-premium w-full">🔓 Unlock with Premium</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="section-cta-row">
+        <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-lg">Join Premium — From ₹1,499/month</a>
+        <a href="pricing.html" class="kh-btn kh-btn-outline kh-btn-lg" style="border-color:rgba(255,255,255,0.3);color:#fff">View Full Pricing →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       WHAT'S INCLUDED IN PREMIUM
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="kh-section" id="resources">
+    <div class="kh-container">
+      <div class="section-header">
+        <span class="section-badge">✨ WHAT YOU GET</span>
+        <h2 class="section-title">Everything in Your Premium Membership</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">📚</div>
+          <h4>120+ Clinical Articles</h4>
+          <p>Full access to the complete article library covering all dental specialties with regular monthly additions.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🎬</div>
+          <h4>Video Masterclasses</h4>
+          <p>HD surgical procedure videos by India's leading implantologists, periodontists, and prosthodontists.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📥</div>
+          <h4>Downloadable PDF Protocols</h4>
+          <p>Print-ready clinical protocol PDFs, patient consent forms, case documentation templates, and reference charts.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🏥</div>
+          <h4>Live Case Discussions</h4>
+          <p>Monthly live webinars with Q&A sessions, expert panel discussions, and member-submitted case reviews.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📜</div>
+          <h4>CE Credit Certificates</h4>
+          <p>IDA-recognized continuing education credits for completed courses, shareable on your professional profile.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💬</div>
+          <h4>Member Community</h4>
+          <p>Private WhatsApp group with 8,400+ verified dental professionals for peer learning and referrals.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔔</div>
+          <h4>Product Import Updates</h4>
+          <p>First access to new products arriving at Murugan Impex — see batch clearances before public listing.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💰</div>
+          <h4>Member-Exclusive Discounts</h4>
+          <p>10–15% exclusive discount on all Murugan Impex product orders for active premium members.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TESTIMONIALS
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="kh-section kh-section-tint">
+    <div class="kh-container">
+      <div class="section-header">
+        <span class="section-badge">💬 MEMBER REVIEWS</span>
+        <h2 class="section-title">Trusted by Dentists Across India</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p>"The sinus lift masterclass alone was worth the entire annual membership. The case library with intraoperative photos is exceptional — I've referred to it in my last 6 surgeries."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">DS</div>
+            <div>
+              <strong>Dr. Deepak Sharma</strong>
+              <span>Oral & Maxillofacial Surgeon, Delhi</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p>"As a dental college faculty, I recommend this to all my postgraduate students. The CAD/CAM articles explain digital workflows better than any textbook available in India."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">PR</div>
+            <div>
+              <strong>Prof. Dr. Priya Raghunath</strong>
+              <span>Professor, Prosthodontics, Bangalore</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p>"The member discount on Murugan Impex products pays for itself! I saved more than the annual membership cost in my first three orders. Highly recommend for any private practice owner."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">AK</div>
+            <div>
+              <strong>Dr. Arjun Krishnamurthy</strong>
+              <span>Private Practice Owner, Chennai</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PRICING CTA BANNER
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="pricing-cta-banner">
+    <div class="kh-container pricing-cta-inner">
+      <div>
+        <h2>Start your premium membership today</h2>
+        <p>Join 8,400+ dental professionals. Cancel anytime. Instant access after payment.</p>
+      </div>
+      <div class="pricing-cta-actions">
+        <a href="pricing.html" class="kh-btn kh-btn-primary kh-btn-lg">View Pricing Plans</a>
+        <a href="pricing.html" class="kh-btn kh-btn-glass kh-btn-lg">Try Free First</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="kh-footer">
+    <div class="kh-container kh-footer-inner">
+      <div class="footer-brand">
+        <strong>Murugan Impex Knowledge Hub</strong>
+        <p>Premium dental education by India's trusted imported dental byproducts company. CDSCO licensed · ISO 13485:2016</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="LinkedIn">in</a>
+          <a href="#" aria-label="YouTube">▶</a>
+          <a href="#" aria-label="WhatsApp">💬</a>
+        </div>
+      </div>
+      <div class="footer-links-col">
+        <h5>Knowledge Hub</h5>
+        <a href="knowledge.html">Home</a>
+        <a href="knowledge.html#free-content">Free Articles</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="dashboard.html">Member Dashboard</a>
+      </div>
+      <div class="footer-links-col">
+        <h5>Specialties</h5>
+        <a href="#">Implantology</a>
+        <a href="#">Biomaterials</a>
+        <a href="#">CAD/CAM Prosthodontics</a>
+        <a href="#">Endodontics</a>
+        <a href="#">Orthodontics</a>
+      </div>
+      <div class="footer-links-col">
+        <h5>Account</h5>
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="account.html">Account Settings</a>
+        <a href="pricing.html">Subscription</a>
+      </div>
+      <div class="footer-links-col">
+        <h5>Legal</h5>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="refund.html">Refund Policy</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+    </div>
+    <div class="kh-footer-bottom">
+      <div class="kh-container footer-bottom-inner">
+        <span>© 2026 Murugan Impex India Pvt Ltd. All rights reserved.</span>
+        <span>🔒 Payments secured by Stripe · 🛡️ SSL Encrypted · CDSCO Licensed</span>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="knowledge.js"></script>
+</body>
+</html>
