@@ -1,306 +1,182 @@
-/**
- * MURUGAN IMPEX — KNOWLEDGE HUB
- * Shared Auth Module (Firebase Authentication + Firestore)
- * All premium access control originates from server-side Firestore rules.
+﻿/**
+ * MURUGAN IMPEX — DENTAL PLATFORM & KNOWLEDGE HUB
+ * auth.js — Shared Supabase Auth, DB, Realtime & Storage Module
  */
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { 
-  getAuth, onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  updateProfile,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { supabase, APP_CONFIG, isSupabaseConfigured } from './supabase-config.js';
+export { supabase };
 
-// ─── EMBEDDED CONFIG (replace with your own) ─────────────────────────────────
-// In production, load this from firebase-config.js using import
-const FIREBASE_CONFIG = {
-  apiKey:            "YOUR_FIREBASE_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
-};
+let _currentUser = null;
+let _currentProfile = null;
 
-const ADMIN_EMAILS = ["admin@muruganimpex.in"];
-
-// ─── INIT FIREBASE ───────────────────────────────────────────────────────────
-let _app, _auth, _db;
-
-function getFirebaseApp() {
-  if (!_app) _app = initializeApp(FIREBASE_CONFIG);
-  return _app;
+export async function getCurrentUser() {
+  const { data: { session } } = await supabase.auth.getSession();
+  _currentUser = session?.user ?? null;
+  return _currentUser;
 }
 
-export function getFirebaseAuth() {
-  if (!_auth) _auth = getAuth(getFirebaseApp());
-  return _auth;
+export async function getCurrentProfile(forceRefresh = false) {
+  if (_currentProfile && !forceRefresh) return _currentProfile;
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  if (error) { console.error('[auth] Profile load failed:', error.message); return null; }
+  _currentProfile = data;
+  return _currentProfile;
 }
 
-export function getFirestoreDB() {
-  if (!_db) _db = getFirestore(getFirebaseApp());
-  return _db;
-}
-
-// ─── AUTH FUNCTIONS ──────────────────────────────────────────────────────────
-
-/** Create new account + user profile in Firestore */
-export async function registerUser({ email, password, name, phone }) {
-  const auth = getFirebaseAuth();
-  const db   = getFirestoreDB();
-
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(cred.user, { displayName: name });
-
-  // Create user profile document in Firestore
-  await setDoc(doc(db, 'users', cred.user.uid), {
-    uid:         cred.user.uid,
-    name,
-    email,
-    phone:       phone || '',
-    role:        'free',               // 'free' | 'premium' | 'admin'
-    memberSince: serverTimestamp(),
-    lastLogin:   serverTimestamp(),
-    subscriptionStatus: 'inactive',    // 'inactive' | 'active' | 'cancelled' | 'expired'
-    subscriptionPlan:   null,          // null | 'monthly' | 'annual'
-    subscriptionEndDate: null,
-    stripeCustomerId:   null,
-    stripeSessionId:    null,
+export async function signUpWithEmail(email, password, meta = {}) {
+  if (!isSupabaseConfigured()) return { user: null, error: new Error('Supabase not configured.') };
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim().toLowerCase(), password,
+    options: { data: { full_name: meta.full_name||'', phone: meta.phone||'', clinic_name: meta.clinic_name||'', dci_number: meta.dci_number||'', gstin: meta.gstin||'' } }
   });
-
-  return cred.user;
-}
-
-/** Sign in existing user + update lastLogin */
-export async function loginUser({ email, password }) {
-  const auth = getFirebaseAuth();
-  const db   = getFirestoreDB();
-
-  const cred = await signInWithEmailAndPassword(auth, email, password);
-
-  // Update last login timestamp
-  await updateDoc(doc(db, 'users', cred.user.uid), {
-    lastLogin: serverTimestamp()
-  }).catch(() => {}); // fail silently if doc doesn't exist yet
-
-  return cred.user;
-}
-
-/** Google Sign-In */
-export async function loginWithGoogle() {
-  const auth     = getFirebaseAuth();
-  const db       = getFirestoreDB();
-  const provider = new GoogleAuthProvider();
-
-  const result = await signInWithPopup(auth, provider);
-  const user   = result.user;
-
-  // Create user doc if first time
-  const userRef  = doc(db, 'users', user.uid);
-  const userSnap = await getDoc(userRef);
-
-  if (!userSnap.exists()) {
-    await setDoc(userRef, {
-      uid:         user.uid,
-      name:        user.displayName || '',
-      email:       user.email,
-      phone:       '',
-      role:        'free',
-      memberSince: serverTimestamp(),
-      lastLogin:   serverTimestamp(),
-      subscriptionStatus: 'inactive',
-      subscriptionPlan:   null,
-      subscriptionEndDate: null,
-      stripeCustomerId:   null,
-      stripeSessionId:    null,
-    });
-  } else {
-    await updateDoc(userRef, { lastLogin: serverTimestamp() });
+  if (error) return { user: null, error };
+  if (data.user && (meta.address || meta.city)) {
+    await supabase.from('profiles').update({ address: meta.address||'', city: meta.city||'', state: meta.state||'', pincode: meta.pincode||'' }).eq('id', data.user.id);
   }
-
-  return user;
+  return { user: data.user, error: null };
 }
 
-/** Sign out current user */
-export async function logoutUser() {
-  const auth = getFirebaseAuth();
-  await signOut(auth);
-  window.location.href = '/knowledge.html';
+export async function signInWithEmail(email, password) {
+  if (!isSupabaseConfigured()) return { user: null, profile: null, error: new Error('Supabase not configured.') };
+  const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+  if (error) return { user: null, profile: null, error };
+  _currentUser = data.user; _currentProfile = null;
+  const profile = await getCurrentProfile();
+  return { user: data.user, profile, error: null };
 }
 
-/** Send password reset email */
-export async function resetPassword(email) {
-  const auth = getFirebaseAuth();
-  await sendPasswordResetEmail(auth, email);
+export async function signInWithGoogle() {
+  if (!isSupabaseConfigured()) { showToast('Supabase not configured.', 'error'); return; }
+  const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/dashboard.html', queryParams: { access_type: 'offline', prompt: 'consent' } } });
+  if (error) { console.error('[auth] Google OAuth:', error.message); showToast('Google sign-in failed.', 'error'); }
 }
 
-// ─── USER PROFILE ────────────────────────────────────────────────────────────
-
-/** Get full user profile from Firestore */
-export async function getUserProfile(uid) {
-  const db   = getFirestoreDB();
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? snap.data() : null;
+export async function signOut() {
+  await supabase.auth.signOut();
+  _currentUser = null; _currentProfile = null;
+  window.location.href = '/login.html';
 }
 
-/** Update user profile fields */
-export async function updateUserProfile(uid, fields) {
-  const db = getFirestoreDB();
-  await updateDoc(doc(db, 'users', uid), fields);
+export async function requireAuth(redirectPath = '/login.html') {
+  const user = await getCurrentUser();
+  if (!user) { window.location.href = redirectPath; return null; }
+  return getCurrentProfile();
 }
 
-// ─── PREMIUM ACCESS CHECK ─────────────────────────────────────────────────────
-// This check uses Firestore — the actual data is protected by Firestore Security Rules
-// so a clever user cannot bypass it by editing localStorage or JS.
+export async function requirePremium(redirectPath = '/pricing.html') {
+  const profile = await requireAuth();
+  if (!profile) return null;
+  if (['premium','admin'].includes(profile.role)) return profile;
+  const { data: sub } = await supabase.from('subscriptions').select('id').eq('user_id', profile.id).eq('status','active').gt('current_period_end', new Date().toISOString()).maybeSingle();
+  if (!sub) { showToast('Premium subscription required.', 'warning'); window.location.href = redirectPath; return null; }
+  return profile;
+}
 
-/**
- * Returns true if the user currently has an active premium subscription.
- * Checks Firestore (server-authoritative) not just localStorage.
- */
-export async function isPremiumUser(uid) {
-  if (!uid) return false;
-  const profile = await getUserProfile(uid);
-  if (!profile) return false;
+export async function requireAdminAccess(redirectPath = '/index.html') {
+  const profile = await requireAuth();
+  if (!profile) return null;
+  if (profile.role !== 'admin') { showToast('Administrator access required.', 'error'); window.location.href = redirectPath; return null; }
+  return profile;
+}
 
-  if (profile.role === 'admin') return true;  // admins always have access
+export async function updateProfile(fields) {
+  const user = await getCurrentUser();
+  if (!user) return { error: new Error('Not authenticated') };
+  const { error } = await supabase.from('profiles').update(fields).eq('id', user.id);
+  if (!error) _currentProfile = null;
+  return { error };
+}
 
-  if (profile.subscriptionStatus !== 'active') return false;
+export async function uploadAvatar(file) {
+  const user = await getCurrentUser();
+  if (!user) return { publicUrl: null, error: new Error('Not authenticated') };
+  const ext = file.name.split('.').pop();
+  const filePath = user.id + '/avatar.' + ext;
+  const { error: uploadError } = await supabase.storage.from(APP_CONFIG.storageBuckets.avatars).upload(filePath, file, { upsert: true });
+  if (uploadError) return { publicUrl: null, error: uploadError };
+  const publicUrl = getPublicUrl(APP_CONFIG.storageBuckets.avatars, filePath);
+  await updateProfile({ avatar_url: publicUrl });
+  return { publicUrl, error: null };
+}
 
-  // Check if subscription has not expired
-  if (profile.subscriptionEndDate) {
-    const now = Date.now();
-    const end = profile.subscriptionEndDate.toDate
-      ? profile.subscriptionEndDate.toDate().getTime()
-      : new Date(profile.subscriptionEndDate).getTime();
-    if (now > end) return false;
+export function getPublicUrl(bucket, path) {
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data?.publicUrl ?? '';
+}
+
+export function onAuthStateChange(callback) {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    _currentUser = session?.user ?? null; _currentProfile = null;
+    if (typeof callback === 'function') callback(event, session);
+  });
+  return () => subscription.unsubscribe();
+}
+
+export function subscribeToTable(table, onInsert, filter = null) {
+  const channel = supabase.channel('realtime:' + table + ':' + Date.now()).on('postgres_changes', { event: 'INSERT', schema: 'public', table, ...(filter ? { filter: filter.column + '=eq.' + filter.value } : {}) }, (payload) => onInsert(payload.new));
+  channel.subscribe();
+  return channel;
+}
+
+export function subscribeToUpdates(table, onUpdate, filter = null) {
+  const channel = supabase.channel('realtime:updates:' + table + ':' + Date.now()).on('postgres_changes', { event: 'UPDATE', schema: 'public', table, ...(filter ? { filter: filter.column + '=eq.' + filter.value } : {}) }, (payload) => onUpdate(payload.new));
+  channel.subscribe();
+  return channel;
+}
+
+export function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+}
+
+export function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+export function showToast(message, type = 'info', duration = 4000) {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    Object.assign(container.style, { position: 'fixed', top: '20px', right: '20px', zIndex: '99999', display: 'flex', flexDirection: 'column', gap: '8px', pointerEvents: 'none' });
+    document.body.appendChild(container);
   }
-
-  return true;
+  const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+  const icons  = { success: '&#10003;', error: '&#10005;', warning: '&#9888;', info: 'ℹ' };
+  const color  = colors[type] ?? colors.info;
+  const icon   = icons[type]  ?? icons.info;
+  const toast  = document.createElement('div');
+  Object.assign(toast.style, { background: '#1e293b', color: '#f1f5f9', borderLeft: '4px solid ' + color, borderRadius: '8px', padding: '12px 16px', fontSize: '14px', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: '360px', boxShadow: '0 8px 24px rgba(0,0,0,0.3)', pointerEvents: 'auto', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', animation: 'toastSlideIn 0.3s ease', transition: 'opacity 0.3s' });
+  toast.innerHTML = '<span style="color:' + color + ';font-weight:bold;font-size:16px">' + icon + '</span><span>' + message + '</span>';
+  if (!document.getElementById('toast-keyframes')) {
+    const s = document.createElement('style'); s.id = 'toast-keyframes';
+    s.textContent = '@keyframes toastSlideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }';
+    document.head.appendChild(s);
+  }
+  const dismiss = () => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); };
+  toast.addEventListener('click', dismiss);
+  container.appendChild(toast);
+  if (duration > 0) setTimeout(dismiss, duration);
 }
 
-/** Returns true if the user is an admin */
-export async function isAdminUser(uid) {
-  if (!uid) return false;
-  const profile = await getUserProfile(uid);
-  return profile?.role === 'admin' || ADMIN_EMAILS.includes(profile?.email);
+export function generateOrderReference() {
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  return 'MI-' + date + '-' + Math.floor(10000 + Math.random() * 90000);
 }
 
-// ─── SUBSCRIPTION UPDATE (called by webhook handler or Stripe success page) ──
-
-/**
- * Update subscription status in Firestore after successful Stripe payment.
- * In production: this is called by a Firebase Cloud Function webhook, NOT client-side.
- * For local demo/testing: can be called from payment-success.html after verifying session.
- */
-export async function activateSubscription(uid, { plan, sessionId, customerId, endDate }) {
-  const db = getFirestoreDB();
-  await updateDoc(doc(db, 'users', uid), {
-    role:                'premium',
-    subscriptionStatus:  'active',
-    subscriptionPlan:    plan,
-    subscriptionEndDate: endDate,
-    stripeCustomerId:    customerId || null,
-    stripeSessionId:     sessionId || null,
-    activatedAt:         serverTimestamp()
-  });
+export function generateInvoiceNumber() {
+  const now = new Date();
+  const fy  = now.getMonth() >= 3 ? now.getFullYear() + '-' + String(now.getFullYear()+1).slice(-2) : (now.getFullYear()-1) + '-' + String(now.getFullYear()).slice(-2);
+  return 'INV/' + fy + '/' + Math.floor(10000 + Math.random() * 90000);
 }
 
-// ─── AUTH STATE LISTENER ─────────────────────────────────────────────────────
-
-/**
- * Listen to Firebase auth state and call back with user + profile.
- * Use this on every page to set up UI based on login state.
- */
-export function onAuthReady(callback) {
-  const auth = getFirebaseAuth();
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const profile = await getUserProfile(user.uid);
-      callback(user, profile);
-    } else {
-      callback(null, null);
-    }
-  });
+export function calculateGST(subtotal) {
+  const gst  = parseFloat((subtotal * 0.18).toFixed(2));
+  const half = parseFloat((gst / 2).toFixed(2));
+  return { cgst: half, sgst: half, igst: gst, total: parseFloat((subtotal + gst).toFixed(2)) };
 }
 
-/**
- * Gate a page: if user not logged in → redirect to login.
- * If logged in but not premium → redirect to pricing.
- * Only call this on premium pages.
- */
-export function requirePremiumAccess() {
-  const auth = getFirebaseAuth();
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      // Not logged in
-      window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
-      return;
-    }
-
-    const premium = await isPremiumUser(user.uid);
-    if (!premium) {
-      // Logged in but not premium
-      window.location.href = '/pricing.html?access=denied';
-      return;
-    }
-    // User is premium — page can render content
-    document.body.classList.add('premium-access-granted');
-  });
-}
-
-/**
- * Gate a page: admin only. Redirects non-admins away.
- */
-export function requireAdminAccess() {
-  const auth = getFirebaseAuth();
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = '/login.html?redirect=/admin.html';
-      return;
-    }
-    const admin = await isAdminUser(user.uid);
-    if (!admin) {
-      window.location.href = '/knowledge.html';
-      return;
-    }
-    document.body.classList.add('admin-access-granted');
-  });
-}
-
-// ─── CONTENT FETCH (with access control) ─────────────────────────────────────
-
-/** 
- * Fetch all free content articles from Firestore.
- * Firestore rules ensure premium content is not returned unless user is premium.
- */
-export async function getFreeContent() {
-  const db = getFirestoreDB();
-  const q  = query(collection(db, 'content'), where('tier', '==', 'free'), where('published', '==', true));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-/** Fetch all content for premium users */
-export async function getPremiumContent() {
-  const db = getFirestoreDB();
-  const q  = query(collection(db, 'content'), where('published', '==', true));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-/** Get a single article by ID */
-export async function getArticle(id) {
-  const db   = getFirestoreDB();
-  const snap = await getDoc(doc(db, 'content', id));
-  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+export function generateAWB() {
+  return 'BD' + Math.floor(100000000 + Math.random() * 900000000);
 }
